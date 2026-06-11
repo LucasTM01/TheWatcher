@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Histórico de mensagens enviadas</h2>
+
+<form method="get" class="toolbar">
+  <select name="source">
+    <option value="">todas as fontes</option>
+    {% for s in sources %}
+      <option value="{{ s }}" {% if s == sel_source %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn btn-small">filtrar</button>
+</form>
+
+<table class="grid">
+  <thead>
+  <tr><th>Quando</th><th>Fonte</th><th>Canal</th><th>Destino</th>
+      <th>Assunto</th><th>Status</th></tr>
+  </thead>
+  <tbody>
+  {% for a in items %}
+    <tr>
+      <td class="nowrap">{{ a.ts|dt }}</td>
+      <td>{{ a.source }}{% if a.target %} <div class="sub">{{ a.target }}</div>{% endif %}</td>
+      <td>{{ a.channel }}</td>
+      <td class="detail">{{ a.recipient }}</td>
+      <td class="detail">{{ a.subject }}
+        {% if a.preview %}<div class="sub">{{ a.preview }}</div>{% endif %}</td>
+      <td>
+        {% if a.status == 'sent' %}
+          <span class="badge ok">enviado</span>
+        {% else %}
+          <span class="badge err" title="{{ a.error }}">falhou</span>
+          <div class="sub">{{ a.error[:120] }}</div>
+        {% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6">Nenhuma mensagem enviada ainda.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

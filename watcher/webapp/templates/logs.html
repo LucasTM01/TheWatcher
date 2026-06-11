@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Log de checagens</h2>
+
+<form method="get" class="toolbar">
+  <select name="source">
+    <option value="">todas as fontes</option>
+    {% for s in sources %}
+      <option value="{{ s }}" {% if s == sel_source %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <select name="outcome">
+    <option value="">todos os resultados</option>
+    {% for o in outcomes %}
+      <option value="{{ o }}" {% if o == sel_outcome %}selected{% endif %}>{{ o|outcome_label }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn btn-small">filtrar</button>
+</form>
+
+<table class="grid">
+  <thead>
+  <tr><th>Quando</th><th>Fonte</th><th>Disparo</th><th>Resultado</th>
+      <th>Detalhe</th><th>Duração</th><th>Novos</th></tr>
+  </thead>
+  <tbody>
+  {% for c in checks %}
+    <tr>
+      <td class="nowrap">{{ c.ts|dt }}</td>
+      <td>{{ c.source }}</td>
+      <td>{{ c.trigger_kind }}</td>
+      <td><span class="badge {{ c.outcome|outcome_class }}">{{ c.outcome|outcome_label }}</span></td>
+      <td class="detail">{{ c.detail }}</td>
+      <td class="nowrap">{{ c.duration_ms }} ms</td>
+      <td>{{ c.new_items or '' }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7">Nenhuma checagem registrada ainda.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

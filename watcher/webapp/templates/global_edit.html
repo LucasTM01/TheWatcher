@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Configuração global</h2>
+
+<form method="post" class="card form">
+  <fieldset>
+    <legend>E-mail (envio via SMTP)</legend>
+    <div class="row">
+      <label>Servidor SMTP
+        <input type="text" name="smtp_host" value="{{ gcfg.email.smtp_host }}">
+      </label>
+      <label>Porta (SSL)
+        <input type="number" name="smtp_port" value="{{ gcfg.email.smtp_port }}">
+      </label>
+    </div>
+    <label>Conta remetente (login SMTP)
+      <input type="text" name="smtp_user" value="{{ gcfg.email.smtp_user }}">
+    </label>
+    <label>Destinatários (um por linha)
+      <textarea name="recipients" rows="3">{{ gcfg.email.recipients | join('\n') }}</textarea>
+    </label>
+    <div class="hint">
+      Senha de app do Gmail: <b>{{ '✅ preenchida no .env' if secrets.smtp else '❌ AUSENTE — preencha SMTP_PASSWORD no arquivo .env (veja o README)' }}</b>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Telegram</legend>
+    <label>chat_id do grupo de destino (grupos começam com “-”)
+      <input type="text" name="chat_id" value="{{ gcfg.telegram.chat_id }}">
+    </label>
+    <div class="hint">
+      Token do bot: <b>{{ '✅ preenchido no .env' if secrets.telegram else '❌ AUSENTE — preencha TELEGRAM_BOT_TOKEN no arquivo .env (veja o README)' }}</b>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>HTTP</legend>
+    <label>User-Agent (não remova — Anfir/ACEA bloqueiam UA genérico)
+      <input type="text" name="user_agent" value="{{ gcfg.http.user_agent }}">
+    </label>
+    <div class="row">
+      <label>Timeout (segundos)
+        <input type="number" name="timeout_seconds" value="{{ gcfg.http.timeout_seconds }}">
+      </label>
+      <label>Tentativas extras (retries)
+        <input type="number" name="retries" value="{{ gcfg.http.retries }}">
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Motor</legend>
+    <label>Avisar após N falhas consecutivas de uma fonte (0 = nunca)
+      <input type="number" name="failure_alert_after"
+             value="{{ gcfg.engine.failure_alert_after }}">
+    </label>
+  </fieldset>
+
+  <div class="row">
+    <button class="btn btn-primary" type="submit">Salvar</button>
+    <a class="btn btn-ghost" href="{{ url_for('dashboard') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}

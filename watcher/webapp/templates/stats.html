@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Estatísticas</h2>
+
+<table class="grid">
+  <thead>
+  <tr>
+    <th>Fonte</th><th>Checagens</th><th>Efetivas c/ novidade</th>
+    <th>Efetivas sem novidade</th><th>Puladas</th><th>Erros</th>
+    <th>Taxa de falha</th><th>Duração média</th><th>Alertas enviados</th>
+    <th>Última divulgação detectada</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for s in data %}
+    <tr>
+      <td>{{ names.get(s.source, s.source) }}<div class="sub">{{ s.source }}</div></td>
+      <td>{{ s.total_checks }}</td>
+      <td>{{ s.ran_new or 0 }}</td>
+      <td>{{ s.ran_nothing or 0 }}</td>
+      <td>{{ s.skipped or 0 }}</td>
+      <td>{{ s.errors or 0 }}</td>
+      <td>
+        <span class="badge {{ 'err' if s.fail_rate > 20 else ('skip' if s.fail_rate > 0 else 'ok') }}">
+          {{ s.fail_rate }}%</span>
+      </td>
+      <td class="nowrap">{{ (s.avg_ms or 0) | round | int }} ms</td>
+      <td>{{ s.alerts_sent }}</td>
+      <td class="detail">
+        {% set d = detections.get(s.source) %}
+        {% if d %}{{ d.title[:60] }} <div class="sub">visto em {{ d.first_seen|dt }}</div>
+        {% else %}—{% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="10">Sem dados ainda — rode uma checagem.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

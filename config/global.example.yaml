@@ -1,0 +1,34 @@
+# ============================================================
+# Configuração GLOBAL do TheWatcher — ARQUIVO MODELO
+# Copie este arquivo para "global.yaml" e preencha com os seus
+# dados. O instalar.bat faz essa cópia automaticamente.
+# (os segredos — senha do e-mail e token — ficam no .env, nunca aqui)
+# ============================================================
+
+email:
+  # Servidor SMTP (Gmail por padrão)
+  smtp_host: smtp.gmail.com
+  smtp_port: 587                      # 465 = SSL | 587 = STARTTLS
+  # Conta que ENVIA os alertas (a senha de app vai no .env -> SMTP_PASSWORD)
+  smtp_user: seu-remetente@gmail.com
+  # Quem RECEBE os alertas (um ou mais, um por linha)
+  recipients:
+    - voce@exemplo.com
+
+telegram:
+  # chat_id do destino (o token do bot vai no .env -> TELEGRAM_BOT_TOKEN)
+  # Como obter: veja a seção "Telegram" do README.md
+  chat_id: ""
+
+http:
+  # User-Agent de navegador: obrigatório (Anfir e ACEA bloqueiam UA genérico)
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+  timeout_seconds: 30
+  retries: 2
+
+engine:
+  # Após N falhas consecutivas de uma fonte, envia um aviso de manutenção
+  failure_alert_after: 3
+
+panel:
+  port: 8765

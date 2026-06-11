@@ -1,0 +1,106 @@
+:root {
+  --bg: #f5f6f8; --card: #ffffff; --ink: #1d2733; --sub: #6b7686;
+  --line: #e3e7ed; --accent: #2b6cb0; --accent-ink: #ffffff;
+  --ok: #1e7e34; --warn: #b7791f; --err: #c53030; --off: #9aa4b2;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.45 "Segoe UI", system-ui, Arial, sans-serif;
+}
+header {
+  display: flex; align-items: center; gap: 24px;
+  background: #16212e; color: #fff; padding: 10px 22px;
+}
+.brand { font-weight: 700; font-size: 16px; letter-spacing: .3px; }
+nav { display: flex; gap: 4px; flex-wrap: wrap; }
+nav a {
+  color: #cfd8e3; text-decoration: none; padding: 6px 12px; border-radius: 6px;
+}
+nav a:hover { background: #243447; color: #fff; }
+main { max-width: 1240px; margin: 22px auto 40px; padding: 0 18px; }
+footer { text-align: center; color: var(--sub); padding: 14px; font-size: 12px; }
+
+h2 { margin: 4px 0 16px; font-size: 19px; }
+h3 { margin: 2px 0 10px; font-size: 15px; }
+.sub { color: var(--sub); font-size: 12px; }
+.hint { color: var(--sub); font-size: 12.5px; margin: 6px 0; }
+.nowrap { white-space: nowrap; }
+.detail { max-width: 420px; overflow-wrap: anywhere; }
+code, pre { background: #eef1f5; border-radius: 4px; }
+pre { padding: 10px; overflow: auto; font-size: 12.5px; }
+
+.toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.inline { display: inline; }
+
+table.grid {
+  width: 100%; border-collapse: collapse; background: var(--card);
+  border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+}
+.grid th, .grid td {
+  padding: 9px 10px; border-bottom: 1px solid var(--line);
+  text-align: left; vertical-align: top;
+}
+.grid thead th {
+  background: #eef1f5; font-size: 12px; text-transform: uppercase;
+  letter-spacing: .4px; color: #46505c;
+}
+.grid tbody tr:hover { background: #fafbfc; }
+.row-off td { opacity: .55; }
+.src-name { font-weight: 600; color: var(--ink); text-decoration: none; }
+.src-name:hover { color: var(--accent); }
+
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 11.5px; font-weight: 600; background: #e8ecf1; color: #46505c;
+}
+.badge.ok { background: #e3f3e7; color: var(--ok); }
+.badge.ok-new { background: #def1ff; color: #1565c0; }
+.badge.skip { background: #f4ecdc; color: var(--warn); }
+.badge.err { background: #fde3e3; color: var(--err); }
+
+.pill {
+  border: none; cursor: pointer; padding: 3px 12px; border-radius: 12px;
+  font-size: 12px; font-weight: 600;
+}
+.pill-on { background: #e3f3e7; color: var(--ok); }
+.pill-off { background: #f0f1f3; color: var(--off); }
+
+.btn {
+  display: inline-block; border: 1px solid var(--line); background: var(--card);
+  color: var(--ink); padding: 7px 14px; border-radius: 7px; cursor: pointer;
+  font-size: 13.5px; text-decoration: none;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn-primary {
+  background: var(--accent); border-color: var(--accent); color: var(--accent-ink);
+}
+.btn-primary:hover { background: #245a94; color: #fff; }
+.btn-small { padding: 4px 10px; font-size: 12.5px; }
+.btn-ghost { background: transparent; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.flash {
+  padding: 10px 14px; border-radius: 7px; margin-bottom: 14px; font-size: 13.5px;
+}
+.flash-info { background: #e7f0fb; color: #205081; }
+.flash-warn { background: #fdeeea; color: #93362a; }
+
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+  padding: 18px 20px; margin-bottom: 18px;
+}
+.form label { display: block; margin: 12px 0; font-weight: 600; }
+.form input[type="text"], .form input[type="number"], .form select, .form textarea {
+  display: block; width: 100%; max-width: 560px; margin-top: 5px;
+  padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px;
+  font: inherit; font-weight: 400; background: #fff;
+}
+.form .check { font-weight: 500; }
+.form .check input { margin-right: 7px; }
+.form fieldset {
+  border: 1px solid var(--line); border-radius: 8px; margin: 16px 0; padding: 6px 14px 12px;
+}
+.form legend { font-weight: 700; font-size: 13px; padding: 0 6px; }
+.form .row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.form .row label { flex: 0 0 auto; min-width: 160px; }

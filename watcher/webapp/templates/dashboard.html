@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block refresh %}
+  {% if run.running %}<meta http-equiv="refresh" content="4">
+  {% else %}<meta http-equiv="refresh" content="90">{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="toolbar">
+  <form method="post" action="{{ url_for('run_now') }}" class="inline">
+    <input type="hidden" name="source" value="all">
+    <button class="btn btn-primary" {% if run.running %}disabled{% endif %}
+            onclick="return confirm('Forçar a checagem de TODAS as fontes agora? (ignora janela, throttle e já-saiu; não reenvia itens já conhecidos)')">
+      ▶ Checar tudo agora
+    </button>
+  </form>
+  <span class="hint">hoje é dia {{ now.day }} · atualizado às {{ now.strftime('%H:%M:%S') }}</span>
+</div>
+
+{% if run.running %}
+  <div class="flash flash-info">⏳ Checagem manual em andamento ({{ run.label }})…
+    esta página atualiza sozinha.</div>
+{% elif run.summary %}
+  <div class="flash flash-info">Última checagem manual: {{ run.summary }}</div>
+{% elif run.error %}
+  <div class="flash flash-warn">Última checagem manual falhou: {{ run.error }}</div>
+{% endif %}
+
+<table class="grid">
+  <thead>
+  <tr>
+    <th>Fonte</th><th>Ativa</th><th>Janela</th><th>Periodicidade</th>
+    <th>Última checagem</th><th>Última divulgação detectada</th>
+    <th>Agora</th><th>Ações</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for r in rows %}
+    <tr class="{% if not r.cfg.enabled %}row-off{% endif %}">
+      <td>
+        <a class="src-name" href="{{ url_for('source_edit', sid=r.id) }}">{{ r.cfg.display_name }}</a>
+        <div class="sub">{{ r.id }}</div>
+      </td>
+      <td>
+        <form method="post" action="{{ url_for('toggle', sid=r.id) }}" class="inline">
+          <button class="pill {{ 'pill-on' if r.cfg.enabled else 'pill-off' }}"
+                  title="clique para {{ 'desativar' if r.cfg.enabled else 'ativar' }}">
+            {{ 'ativa' if r.cfg.enabled else 'inativa' }}
+          </button>
+        </form>
+      </td>
+      <td>{{ r.window_label }}
+        {% if r.cfg.min_interval_minutes %}<div class="sub">throttle {{ r.cfg.min_interval_minutes }} min</div>{% endif %}
+      </td>
+      <td>{{ {'monthly':'mensal','weekly':'semanal','continuous':'contínua'}[r.cfg.periodicity] }}
+        <div class="sub">{{ 'para quando sai' if r.cfg.stop_after_hit else 'sempre avisa' }}</div>
+      </td>
+      <td>
+        {% if r.last_check %}
+          {{ r.last_check.ts|dt }}
+          <div class="sub badge {{ r.last_check.outcome|outcome_class }}">{{ r.last_check.outcome|outcome_label }}</div>
+        {% else %}—{% endif %}
+      </td>
+      <td>
+        {% if r.last_detection %}
+          <a href="{{ r.last_detection.url }}" target="_blank" rel="noopener">{{ r.last_detection.title[:70] }}</a>
+          <div class="sub">visto em {{ r.last_detection.first_seen|dt }}</div>
+        {% else %}—{% endif %}
+      </td>
+      <td>
+        <span class="badge {{ 'ok' if r.would_run else 'skip' }}"
+              title="{{ r.reason }}">{{ 'rodaria' if r.would_run else 'pularia' }}</span>
+        <div class="sub" style="max-width:180px">{{ r.reason }}</div>
+      </td>
+      <td>
+        <form method="post" action="{{ url_for('run_now') }}" class="inline">
+          <input type="hidden" name="source" value="{{ r.id }}">
+          <button class="btn btn-small" {% if run.running %}disabled{% endif %}>checar</button>
+        </form>
+        <form method="post" action="{{ url_for('run_now') }}" class="inline">
+          <input type="hidden" name="source" value="{{ r.id }}">
+          <input type="hidden" name="resend" value="1">
+          <button class="btn btn-small btn-ghost" {% if run.running %}disabled{% endif %}
+                  title="se não houver novidade, reenvia o último item conhecido como teste"
+                  onclick="return confirm('Checar {{ r.id }} e, se nada novo, REENVIAR o último item como teste de mensagem?')">teste envio</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,20 @@
+# Segredos — nunca versionar
+.env
+
+# Config local com dados pessoais (e-mails, chat_id, remetente).
+# Use config/global.example.yaml como modelo; o seu global.yaml fica só local.
+config/global.yaml
+
+# Ambiente virtual
+.venv/
+
+# Estado, logs e banco local (contém histórico de alertas com e-mails)
+data/
+
+# Python
+__pycache__/
+*.pyc
+
+# Config local de ferramentas (Claude Code, IDE)
+.claude/settings.local.json
+.idea/

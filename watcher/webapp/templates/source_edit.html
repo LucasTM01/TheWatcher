@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Configurar fonte — {{ cfg.display_name }} <span class="sub">({{ sid }})</span></h2>
+
+<form method="post" class="card form">
+  <label class="check">
+    <input type="checkbox" name="enabled" {% if cfg.enabled %}checked{% endif %}>
+    Fonte ativa
+  </label>
+
+  <label>Nome de exibição
+    <input type="text" name="display_name" value="{{ cfg.display_name }}">
+  </label>
+
+  <label>Título do alerta
+    <input type="text" name="alert_title" value="{{ cfg.alert_title }}">
+  </label>
+
+  <label>Periodicidade do dado
+    <select name="periodicity">
+      {% for p in periodicity_options %}
+        <option value="{{ p }}" {% if cfg.periodicity == p %}selected{% endif %}>
+          {{ periodicity_labels[p] }}</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <fieldset>
+    <legend>Janela de checagem (dias do mês)</legend>
+    <label class="check">
+      <input type="checkbox" name="window_enabled" {% if cfg.window %}checked{% endif %}>
+      Restringir a uma janela de dias (desmarcado = todos os dias)
+    </label>
+    <div class="row">
+      <label>Do dia
+        <input type="number" name="start_day" min="1" max="31"
+               value="{{ cfg.window.start_day if cfg.window else 1 }}">
+      </label>
+      <label>ao dia
+        <input type="number" name="end_day" min="1" max="31"
+               value="{{ cfg.window.end_day if cfg.window else 31 }}">
+      </label>
+    </div>
+    <div class="hint">Se o dia inicial for MAIOR que o final, a janela cruza o mês
+      (ex.: 25 → 5 vale do dia 25 até o dia 5 do mês seguinte).</div>
+  </fieldset>
+
+  <label class="check">
+    <input type="checkbox" name="stop_after_hit" {% if cfg.stop_after_hit %}checked{% endif %}>
+    Parar de checar quando já saiu no período (desmarcado = sempre avisar)
+  </label>
+
+  <label>Intervalo mínimo entre checagens efetivas (minutos; 0 = sem throttle)
+    <input type="number" name="min_interval_minutes" min="0"
+           value="{{ cfg.min_interval_minutes }}">
+  </label>
+
+  <fieldset>
+    <legend>Destinos do alerta</legend>
+    {% for c in channel_options %}
+      <label class="check">
+        <input type="checkbox" name="ch_{{ c }}" {% if c in cfg.channels %}checked{% endif %}>
+        {{ c }}
+      </label>
+    {% endfor %}
+  </fieldset>
+
+  <label>Tamanho do trecho no corpo da mensagem (caracteres)
+    <input type="number" name="preview_chars" min="0" value="{{ cfg.preview_chars }}">
+  </label>
+
+  <div class="row">
+    <button class="btn btn-primary" type="submit">Salvar</button>
+    <a class="btn btn-ghost" href="{{ url_for('dashboard') }}">Cancelar</a>
+  </div>
+</form>
+
+<div class="card">
+  <h3>Parâmetros específicos da fonte</h3>
+  <p class="hint">Editáveis no arquivo <code>config/sources.yaml</code> (campo
+    <code>params</code> da fonte <code>{{ sid }}</code>) — URLs, lista de empresas
+    da CVM, alvos etc.</p>
+  <pre>{{ params_yaml }}</pre>
+</div>
+{% endblock %}

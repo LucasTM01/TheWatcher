@@ -1,0 +1,186 @@
+# ============================================================
+# Configuração POR SUBMÓDULO do TheWatcher
+# Pode editar aqui ou pelo painel (clicando no nome da fonte).
+# ATENÇÃO: salvar pelo painel regrava este arquivo SEM os
+# comentários — os campos estão documentados no README (seção 9).
+#
+# Campos:
+#   enabled              true/false — liga/desliga a fonte
+#   display_name         nome exibido no painel e nos logs
+#   periodicity          monthly | weekly | continuous
+#                        (define a "chave de período" do parar-quando-já-saiu)
+#   window               janela de DIAS DO MÊS em que faz sentido checar.
+#                        {start_day: A, end_day: B}. Se A > B a janela cruza
+#                        o mês (ex.: IATA 25 -> 5). null = todos os dias.
+#   stop_after_hit       true  = sai 1x no período: detectou -> para de checar
+#                        false = pode sair várias vezes: sempre avisa
+#   min_interval_minutes intervalo mínimo entre checagens EFETIVAS (throttle).
+#                        0 = sem throttle. CVM usa 120 (2 horas).
+#   channels             destinos do alerta: [email], [telegram] ou ambos
+#   alert_title          título padrão da mensagem
+#   preview_chars        tamanho do trecho de texto no corpo da mensagem
+#   params               parâmetros específicos da fonte (URLs, listas etc.)
+# ============================================================
+
+fabus:
+  enabled: true
+  display_name: "Fabus — Produção das associadas"
+  periodicity: monthly
+  window: {start_day: 4, end_day: 16}
+  stop_after_hit: true
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "🚌 FABUS — Produção das associadas divulgada"
+  preview_chars: 300
+  params:
+    url: "https://www.fabus.com.br/producao-das-associadas/"
+
+fenabrave:
+  enabled: true
+  display_name: "Fenabrave — Emplacamentos"
+  periodicity: monthly
+  window: {start_day: 2, end_day: 8}
+  stop_after_hit: true
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "📊 FENABRAVE — Emplacamentos divulgados"
+  preview_chars: 300
+  params:
+    url: "https://www.fenabrave.org.br/portalv2/Conteudo/emplacamentos"
+
+anfavea:
+  enabled: true
+  display_name: "Anfavea — Coletiva de imprensa"
+  periodicity: monthly
+  window: {start_day: 2, end_day: 15}
+  stop_after_hit: true
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "🚗 ANFAVEA — Dados da coletiva de imprensa divulgados"
+  preview_chars: 300
+  params:
+    url: "https://anfavea.com.br/site/coletiva-de-imprensa-2/"
+
+acea:
+  enabled: true
+  display_name: "ACEA — Emplacamentos Europa"
+  periodicity: monthly
+  window: {start_day: 23, end_day: 31}
+  stop_after_hit: true
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "🇪🇺 ACEA — Emplacamentos na Europa divulgados"
+  preview_chars: 300
+  params:
+    # Press releases via API REST do WordPress (pr-pc = carros, pr-cv = comerciais)
+    api_base: "https://www.acea.auto/wp-json/wp/v2"
+    site_url: "https://www.acea.auto/nav/?content=news&vehicle=passenger-cars+commercial-vehicles&tag=registrations-of-vehicles"
+    targets: [pc, cv]
+
+iata:
+  enabled: true
+  display_name: "IATA — Air Market Analysis"
+  periodicity: monthly
+  window: {start_day: 25, end_day: 5}     # cruza o mês
+  stop_after_hit: true
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "✈️ IATA — Market Analysis divulgado"
+  preview_chars: 300
+  params:
+    url: "https://www.iata.org/en/publications/economics/economics-library/?Search=&EconomicsL2=146&Ordering=DateDesc"
+    targets: [passenger, cargo]
+
+anfir:
+  enabled: true
+  display_name: "Anfir — Dados do setor"
+  periodicity: monthly
+  window: {start_day: 1, end_day: 15}
+  stop_after_hit: true
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "🚚 ANFIR — Dados do setor divulgados"
+  preview_chars: 300
+  params:
+    # {ano} é substituído automaticamente pelo ano corrente.
+    # Em janeiro/fevereiro o ano anterior também é consultado.
+    url_template: "https://anfir.org.br/dados-do-setor.php?selAno={ano}"
+
+secex:
+  enabled: true
+  display_name: "Secex — Balança comercial semanal"
+  periodicity: weekly
+  window: {start_day: 1, end_day: 15}
+  stop_after_hit: false                   # sai mais de 1x -> sempre avisa
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "⚖️ SECEX — Balança comercial atualizada"
+  preview_chars: 300
+  params:
+    url: "https://balanca.economia.gov.br/balanca/publicacoes_dados_consolidados/nota.html"
+
+conab:
+  enabled: true
+  display_name: "CONAB — Boletins (logístico e grãos)"
+  periodicity: continuous
+  window: null                            # todos os dias
+  stop_after_hit: false                   # cada boletim novo gera alerta
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "🌾 CONAB — Boletim divulgado"
+  preview_chars: 300
+  params:
+    targets:
+      logistico:
+        nome: "Boletim Logístico"
+        url: "https://www.gov.br/conab/pt-br/atuacao/logistica/boletim-logistico"
+      graos:
+        nome: "Boletim da Safra de Grãos"
+        url: "https://www.gov.br/conab/pt-br/atuacao/informacoes-agropecuarias/safras/safra-de-graos/boletim-da-safra-de-graos"
+
+antt:
+  enabled: true
+  display_name: "ANTT — Monitriip (bilhetes de passagem)"
+  # Os CSVs sobem em dias irregulares (ex.: Fev26 só entrou em 01/06) —
+  # checagem contínua via API leve do CKAN, alerta a cada recurso novo.
+  periodicity: continuous
+  window: null
+  stop_after_hit: false
+  min_interval_minutes: 0
+  channels: [email, telegram]
+  alert_title: "🚌 ANTT — Novo CSV do Monitriip disponível"
+  preview_chars: 300
+  params:
+    api_url: "https://dados.antt.gov.br/api/3/action/package_show?id=monitriip-bilhetes-de-passagem"
+    site_url: "https://dados.antt.gov.br/dataset/monitriip-bilhetes-de-passagem"
+
+cvm:
+  enabled: true
+  display_name: "CVM — Documentos por empresa"
+  periodicity: continuous                  # caso especial: dedupe por protocolo
+  window: null                             # todos os dias
+  stop_after_hit: false                    # cada documento novo gera alerta
+  min_interval_minutes: 120                # throttle de 2 horas
+  channels: [email, telegram]
+  alert_title: "🏛️ CVM"
+  preview_chars: 300
+  params:
+    # Dias de retrocesso na consulta (cobre fim de semana/feriado; o
+    # dedupe por protocolo evita repetição)
+    lookback_days: 3
+    # Categorias que geram alerta. Lista vazia = TODAS.
+    # Exemplos para filtrar: ["Fato Relevante", "Comunicado ao Mercado"]
+    categories: []
+    # Empresas monitoradas (código CVM - nome)
+    companies:
+      - {code: 5410,  name: "WEG S.A."}
+      - {code: 20087, name: "EMBRAER S.A."}
+      - {code: 8451,  name: "MARCOPOLO S.A."}
+      - {code: 25712, name: "GPS PARTICIPAÇÕES E EMPREENDIMENTOS S.A."}
+      - {code: 14109, name: "RANDONCORP S.A."}
+      - {code: 6211,  name: "FRASLE MOBILITY S.A."}
+      - {code: 25453, name: "INTELBRAS S.A. IND. DE TELECOMUNICAÇÃO ELETRÔNICA BRASILEIRA"}
+      - {code: 11932, name: "IOCHPE MAXION S.A."}
+      - {code: 22012, name: "MILLS LOCAÇÃO, SERVIÇOS E LOGÍSTICA S.A."}
+      - {code: 26069, name: "ARMAC LOCAÇÃO, LOGÍSTICA E SERVIÇOS S.A."}
+      - {code: 24236, name: "PRINER SERVIÇOS INDUSTRIAIS S.A."}
