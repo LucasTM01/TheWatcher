@@ -1,6 +1,9 @@
-"""Painel web local (Flask, só localhost).
+"""Painel web (Flask).
 
-Sobe com:  python -m watcher panel   (ou pelo abrir_painel.bat)
+Por padrão escuta só em localhost (127.0.0.1); veja "panel.host" em
+config/global.yaml para liberar acesso pela rede local (0.0.0.0).
+
+Sobe com:  python -m watcher panel   (ou pelo abrir_painel.bat / .sh)
 """
 from __future__ import annotations
 
@@ -264,9 +267,12 @@ def run_panel(port: int | None = None) -> None:
     engine.setup_logging()
     config.load_secrets()
     gcfg = config.load_global()
-    port = port or int(gcfg.get("panel", {}).get("port", 8765))
+    panel_cfg = gcfg.get("panel", {})
+    port = port or int(panel_cfg.get("port", 8765))
+    host = panel_cfg.get("host") or "127.0.0.1"
     app = create_app()
-    threading.Timer(
-        1.2, lambda: webbrowser.open(f"http://127.0.0.1:{port}/")).start()
-    print(f"TheWatcher — painel em http://127.0.0.1:{port}/ (Ctrl+C encerra)")
-    app.run(host="127.0.0.1", port=port, debug=False)
+    if host in ("127.0.0.1", "localhost"):
+        threading.Timer(
+            1.2, lambda: webbrowser.open(f"http://127.0.0.1:{port}/")).start()
+    print(f"TheWatcher — painel em http://{host}:{port}/ (Ctrl+C encerra)")
+    app.run(host=host, port=port, debug=False)

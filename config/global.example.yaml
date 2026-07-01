@@ -32,3 +32,8 @@ engine:
 
 panel:
   port: 8765
+  # 127.0.0.1 (padrão) = só nesta máquina — em servidor, acesse via túnel SSH.
+  # 0.0.0.0            = acessível de qualquer aparelho na rede local, sem
+  #                       túnel. O painel NÃO tem login — só use 0.0.0.0 em
+  #                       rede doméstica/confiável.
+  host: 127.0.0.1

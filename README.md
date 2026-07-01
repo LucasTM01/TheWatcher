@@ -230,16 +230,31 @@ CRON_TZ=America/Sao_Paulo
 O comando é **idempotente**: rodar `agendar_cron.sh` de novo atualiza o
 horário sem duplicar a tarefa. Para **remover**: `bash remover_cron.sh`.
 
-**Painel no servidor.** O painel escuta só em `127.0.0.1:8765`. Para acessá-lo
-da sua máquina, use um túnel SSH e depois `bash abrir_painel.sh` no servidor:
+**Painel no servidor.** Por padrão o painel escuta só em `127.0.0.1:8765`
+(o `host` da própria máquina). Duas formas de acessar:
 
-```bash
-# na sua máquina:
-ssh -L 8765:127.0.0.1:8765 usuario@servidor
-# no servidor (dentro da sessão SSH):
-bash abrir_painel.sh
-# depois abra http://127.0.0.1:8765 no navegador local
-```
+- **Túnel SSH** (padrão, sem expor nada na rede) — na sua máquina:
+  ```bash
+  ssh -L 8765:127.0.0.1:8765 usuario@servidor
+  # dentro dessa mesma sessão SSH, no servidor:
+  bash abrir_painel.sh
+  # depois abra http://127.0.0.1:8765 no navegador local
+  ```
+  Use o mesmo IP/usuário que você já usa para conectar por SSH no servidor
+  (ex.: `ssh -L 8765:127.0.0.1:8765 usuario@192.168.15.200`).
+
+- **Direto pela rede local, sem túnel** — edite `config/global.yaml` no
+  servidor e, na seção `panel:`, defina:
+  ```yaml
+  panel:
+    port: 8765
+    host: 0.0.0.0
+  ```
+  Rode `bash abrir_painel.sh` de novo e acesse `http://<ip-do-servidor>:8765`
+  de qualquer aparelho na mesma rede (ex.: `http://192.168.15.200:8765`).
+  ⚠️ **O painel não tem login** — só use `0.0.0.0` em rede doméstica/confiável,
+  nunca num servidor exposto à internet. Se o Ubuntu tiver firewall (`ufw`)
+  ativo, libere a porta para a sua rede: `sudo ufw allow from 192.168.0.0/16 to any port 8765`.
 
 **Linha de comando (Linux).** Igual à seção 5, trocando o caminho do Python
 por `.venv/bin/python` (ex.: `.venv/bin/python -m watcher run --source cvm`).
