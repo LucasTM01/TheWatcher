@@ -1,0 +1,3 @@
+# Scripts de shell (Linux/Ubuntu) precisam de quebra de linha LF,
+# senao o cron/bash falha com "bad interpreter: ...^M" apos clonar.
+*.sh text eol=lf

@@ -29,6 +29,9 @@ Silêncio é o estado normal: se nada novo saiu, nada é enviado.
    de e-mail e o `chat_id` ficam em `config/global.yaml` (ou na aba **Config
    global** do painel).
 
+> **No Ubuntu/Linux?** Pule os `.bat` e use os scripts `.sh`: veja a
+> **seção 6-B** (instalação com `bash instalar.sh` e agendamento no cron).
+
 > **Privacidade:** `.env` e `config/global.yaml` guardam seus segredos e dados
 > pessoais (senha, token, e-mails, chat_id) e **não** são versionados (estão no
 > `.gitignore`). Ao subir para o GitHub, só vão os modelos `*.example.*` — os
@@ -173,6 +176,74 @@ Conferir: `schtasks /Query /TN "TheWatcher" /V /FO LIST`
 > sozinha se deve rodar. Há também uma trava (lock) contra execuções
 > sobrepostas.
 
+## 6-B. Rodar no Ubuntu/Linux (cron)
+
+O mesmo código roda no Linux — não há dependência de Windows. No servidor
+Ubuntu, use os scripts `.sh` (equivalentes aos `.bat`) em vez do Task
+Scheduler.
+
+**1) Pré-requisitos e instalação:**
+
+```bash
+sudo apt update && sudo apt install -y git python3 python3-venv python3-pip
+git clone https://github.com/LucasTM01/TheWatcher.git
+cd TheWatcher
+bash instalar.sh          # cria .venv, instala deps e gera .env + config/global.yaml
+```
+
+**2) Configure os segredos e dados** (mesmas seções 2 e 3 acima):
+
+```bash
+nano .env                 # SMTP_PASSWORD e TELEGRAM_BOT_TOKEN
+nano config/global.yaml   # remetente, destinatários e chat_id
+```
+
+**3) Teste sem enviar nada** (não altera o estado nem dispara alertas):
+
+```bash
+.venv/bin/python -m watcher list              # situação de cada fonte
+.venv/bin/python -m watcher run --dry-run     # roda um ciclo "a seco"
+```
+
+**4) Agende no cron** (roda no cron do seu usuário, sem `sudo`):
+
+```bash
+bash agendar_cron.sh
+```
+
+Isso registra um bloco no `crontab -l` que roda **seg–sex, de hora em hora,
+das 05:00 à 01:00**:
+
+```cron
+# >>> TheWatcher >>>
+CRON_TZ=America/Sao_Paulo
+0 0-1,5-23 * * 1-5 /bin/bash /caminho/TheWatcher/run_watcher.sh >> /caminho/TheWatcher/data/logs/cron.log 2>&1
+# <<< TheWatcher <<<
+```
+
+> **Fuso horário:** as janelas de dias usam o horário local do processo. Os
+> scripts fixam `America/Sao_Paulo` (variável `CRON_TZ` no cron e `TZ` no
+> `run_watcher.sh`), então o agendamento funciona **mesmo que o servidor
+> esteja em UTC**. Para usar outro fuso, edite `TZ_NAME` no topo de
+> `agendar_cron.sh` e de `run_watcher.sh` (e rode `agendar_cron.sh` de novo).
+
+O comando é **idempotente**: rodar `agendar_cron.sh` de novo atualiza o
+horário sem duplicar a tarefa. Para **remover**: `bash remover_cron.sh`.
+
+**Painel no servidor.** O painel escuta só em `127.0.0.1:8765`. Para acessá-lo
+da sua máquina, use um túnel SSH e depois `bash abrir_painel.sh` no servidor:
+
+```bash
+# na sua máquina:
+ssh -L 8765:127.0.0.1:8765 usuario@servidor
+# no servidor (dentro da sessão SSH):
+bash abrir_painel.sh
+# depois abra http://127.0.0.1:8765 no navegador local
+```
+
+**Linha de comando (Linux).** Igual à seção 5, trocando o caminho do Python
+por `.venv/bin/python` (ex.: `.venv/bin/python -m watcher run --source cvm`).
+
 ## 7. Como funciona a detecção (resumo)
 
 - **Estado persistente** em `data/state.db` (SQLite): o sistema lembra o que
@@ -199,9 +270,16 @@ Conferir: `schtasks /Query /TN "TheWatcher" /V /FO LIST`
 
 ```
 TheWatcher/
-├── instalar.bat          # instala (uma vez)
-├── abrir_painel.bat      # abre o painel no navegador
+├── instalar.bat          # instala (uma vez)         — Windows
+├── abrir_painel.bat      # abre o painel no navegador — Windows
 ├── run_watcher.bat       # motor headless (Task Scheduler)
+├── agendar_tarefa.bat    # agenda no Task Scheduler   — Windows
+├── remover_tarefa.bat    # remove do Task Scheduler   — Windows
+├── instalar.sh           # instala (uma vez)          — Ubuntu/Linux
+├── abrir_painel.sh       # abre o painel              — Ubuntu/Linux
+├── run_watcher.sh        # motor headless (alvo do cron)
+├── agendar_cron.sh       # agenda no cron             — Ubuntu/Linux
+├── remover_cron.sh       # remove do cron             — Ubuntu/Linux
 ├── .env                  # SEGREDOS (senha de app + token do bot) — não compartilhar
 ├── config/
 │   ├── global.yaml       # e-mail, telegram, http, painel
