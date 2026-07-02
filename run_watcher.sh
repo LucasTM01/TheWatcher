@@ -16,6 +16,7 @@ set -euo pipefail
 TZ_NAME="America/Sao_Paulo"
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$DIR"
 export TZ="${TZ:-$TZ_NAME}"
 export LANG="${LANG:-C.UTF-8}"
 
